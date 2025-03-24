@@ -2,19 +2,34 @@ import psycopg2
 import psycopg2.extras
 import json
 from datetime import datetime
+import logging
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+logger = logging.getLogger("AssistantDatabaseDriver")
 
 class AssistantDatabaseDriver:
-    def __init__(self, dbname="assistant_db", user="postgres", password="password", host="localhost", port="5432"):
-        """Initialize the PostgreSQL database driver with connection parameters."""
-        self.conn_params = {
-            "dbname": dbname,
-            "user": user,
-            "password": password,
-            "host": host,
-            "port": port
-        }
+    def __init__(self):
+        """Initialize the database connection."""
         self.conn = None
-        self.initialize_db()
+        self.conn_params = {
+            "host": os.getenv("PG_HOST", "localhost"),
+            "port": os.getenv("PG_PORT", "5432"),
+            "dbname": os.getenv("PG_DBNAME", "assistant_db"),
+            "user": os.getenv("PG_USER", "postgres"),
+            "password": os.getenv("PG_PASSWORD", "")
+        }
+
+        try:
+            self.connect()
+            logger.info("Database connection established successfully")
+            # Initialize tables if they don't exist
+            self.initialize_db()
+        except Exception as e:
+            logger.error(f"Failed to connect to the database: {e}")
+            print(f"Connection error: {e}")
 
     def connect(self):
         """Establish a connection to the PostgreSQL database."""
@@ -27,8 +42,9 @@ class AssistantDatabaseDriver:
 
     def initialize_db(self):
         """Initialize database and create tables if they don't exist."""
-        if not self.connect():
-            return False
+        if not self.conn or self.conn.closed:
+            if not self.connect():
+                return False
 
         cursor = self.conn.cursor()
 

@@ -9,10 +9,17 @@ logger = logging.getLogger("AssistantFnc")
 
 class AssistantFnc:
 
+    ai_functions = {}
+
     def __init__(self):
         """Initialize the Assistant Function context with database driver."""
         self.db = AssistantDatabaseDriver()
         logger.info("AssistantFnc initialized with database connection")
+
+        for name in dir(self):
+            method = getattr(self,name)
+            if hasattr(method, '_is_ai_callable'):
+                self.ai_functions[name] = method
 
     @llm.ai_callable()
     def get_user_profile(self, user_id: str) -> Dict[str, Any]:
