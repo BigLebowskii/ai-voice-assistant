@@ -19,10 +19,19 @@ class AssistantFnc:
         for name in dir(self):
             method = getattr(self,name)
             if hasattr(method, '_is_ai_callable'):
-                self.ai_functions[name] = method
+               self.ai_functions[name] = method
 
     @llm.ai_callable()
     def get_user_profile(self, user_id: str) -> Dict[str, Any]:
+        """
+        Retrieve a user's profile information from the database.
+
+        Args:
+            user_id: Unique identifier for the user
+
+        Returns:
+            Dictionary containing user profile data including preferences and last interaction
+        """
         user = self.db.get_user(user_id)
         if not user:
             return {"error": "User not found"}
@@ -35,7 +44,17 @@ class AssistantFnc:
         name: Optional[str] = None,
         preferences: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
+        """
+        Create a new user or update an existing user's profile.
 
+        Args:
+            user_id: Unique identifier for the user
+            name: User's name
+            preferences: Dictionary of user preferences
+
+        Returns:
+            Updated user profile information
+        """
         return self.db.create_or_update_user(user_id, name, preferences)
 
     @llm.ai_callable()
@@ -46,7 +65,18 @@ class AssistantFnc:
         response: str,
         context: Optional[Dict[str, Any]] = None
     ) -> bool:
+        """
+        Save a conversation interaction to the database.
 
+        Args:
+            user_id: Unique identifier for the user
+            query: User's input message
+            response: Assistant's response message
+            context: Additional contextual information
+
+        Returns:
+            True if successful
+        """
         try:
             self.db.save_conversation(user_id, query, response, context)
             return True
@@ -60,7 +90,16 @@ class AssistantFnc:
         user_id: str,
         limit: int = 5
     ) -> List[Dict[str, Any]]:
+        """
+        Retrieve recent conversations for a user.
 
+        Args:
+            user_id: Unique identifier for the user
+            limit: Maximum number of conversations to retrieve
+
+        Returns:
+            List of conversation records ordered by most recent first
+        """
         return self.db.get_recent_conversations(user_id, limit)
 
     @llm.ai_callable()
@@ -73,7 +112,20 @@ class AssistantFnc:
         priority: Literal["low", "medium", "high"] = "medium",
         category: Optional[str] = None
     ) -> int:
+        """
+        Add a new task or reminder for a user.
 
+        Args:
+            user_id: Unique identifier for the user
+            title: Task title
+            description: Detailed description of the task
+            due_date: Due date in ISO format (YYYY-MM-DD HH:MM:SS)
+            priority: Task priority (low, medium, high)
+            category: Category for grouping tasks
+
+        Returns:
+            ID of the created task
+        """
         # Convert string due_date to datetime if provided
         parsed_due_date = None
         if due_date:
@@ -90,12 +142,29 @@ class AssistantFnc:
         user_id: str,
         category: Optional[str] = None
     ) -> List[Dict[str, Any]]:
+        """
+        Get all pending tasks for a user, optionally filtered by category.
 
+        Args:
+            user_id: Unique identifier for the user
+            category: Optional category to filter tasks
+
+        Returns:
+            List of pending task records
+        """
         return self.db.get_pending_tasks(user_id, category)
 
     @llm.ai_callable()
     def complete_task(self, task_id: int) -> bool:
+        """
+        Mark a task as completed.
 
+        Args:
+            task_id: ID of the task to mark as completed
+
+        Returns:
+            True if task was successfully marked as completed
+        """
         return self.db.complete_task(task_id)
 
     @llm.ai_callable()
@@ -108,7 +177,20 @@ class AssistantFnc:
         relationship: Optional[str] = None,
         notes: Optional[str] = None
     ) -> int:
+        """
+        Add a new contact for a user.
 
+        Args:
+            user_id: Unique identifier for the user
+            name: Contact's name
+            phone: Contact's phone number
+            email: Contact's email address
+            relationship: Relationship to the user
+            notes: Additional notes about the contact
+
+        Returns:
+            ID of the created contact
+        """
         return self.db.add_contact(user_id, name, phone, email, relationship, notes)
 
     @llm.ai_callable()
@@ -117,7 +199,16 @@ class AssistantFnc:
         user_id: str,
         name_filter: Optional[str] = None
     ) -> List[Dict[str, Any]]:
+        """
+        Get all contacts for a user, optionally filtered by name.
 
+        Args:
+            user_id: Unique identifier for the user
+            name_filter: Optional search term to filter contacts by name
+
+        Returns:
+            List of contact records
+        """
         return self.db.get_contacts(user_id, name_filter)
 
     @llm.ai_callable()
@@ -127,7 +218,17 @@ class AssistantFnc:
         setting_type: Literal["voice_settings", "notification_preferences", "privacy_settings"],
         settings: Dict[str, Any]
     ) -> bool:
+        """
+        Update user settings (voice, notification, or privacy).
 
+        Args:
+            user_id: Unique identifier for the user
+            setting_type: Type of settings to update (voice_settings, notification_preferences, privacy_settings)
+            settings: Dictionary of settings to update
+
+        Returns:
+            True if settings were successfully updated
+        """
         try:
             self.db.update_user_settings(user_id, setting_type, settings)
             return True
@@ -137,7 +238,15 @@ class AssistantFnc:
 
     @llm.ai_callable()
     def get_user_settings(self, user_id: str) -> Dict[str, Any]:
+        """
+        Get all settings for a user.
 
+        Args:
+            user_id: Unique identifier for the user
+
+        Returns:
+            Dictionary containing all user settings
+        """
         settings = self.db.get_user_settings(user_id)
         if not settings:
             return {"error": "Settings not found"}
@@ -145,7 +254,15 @@ class AssistantFnc:
 
     @llm.ai_callable()
     def generate_summary(self, user_id: str) -> Dict[str, Any]:
+        """
+        Generate a summary of user activity and status.
 
+        Args:
+            user_id: Unique identifier for the user
+
+        Returns:
+            Dictionary containing summary information about tasks, contacts, and recent interactions
+        """
         try:
             user = self.db.get_user(user_id)
             pending_tasks = self.db.get_pending_tasks(user_id)

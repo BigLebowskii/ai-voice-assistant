@@ -1,5 +1,5 @@
-from curses.ascii import isdigit
 from __future__ import annotations
+from curses.ascii import isdigit
 from livekit.agents import (
     AutoSubscribe,
     JobContext,
@@ -43,35 +43,6 @@ async def entrypoint(ctx: JobContext):
         )
     )
     session.response.create()
-
-    @session.on("user_speech_comitted")
-    def on_user_speech_comitted(msg: llm.ChatMessage):
-        if isinsatance(msg.content, list):
-            msg.content = "\n".join("[image]" if isinstance(x, llm.C
-
-        if assistant_fnc.get_user_profile():
-            pass
-        else:
-            pass
-
-    def find_profile(msg: llm.ChatMessage):
-        session.conversation.item.create(
-            llm.ChatMessage(
-                role="system",
-                content=""
-            )
-        )
-        session.response.create()
-
-    def handle_query(msg: llm.ChatMessage):
-        session.conversation.item.create(
-            llm.ChatMessage(
-                role="user",
-                content=msg.content
-            )
-        )
-        session.response.create()
-
 
 if __name__ == "__main__":
     cli.run_app(WorkerOptions(entrypoint_fnc=entrypoint))
