@@ -2,19 +2,19 @@ from __future__ import annotations
 from typing import List, Dict, Optional, Any, Literal
 from datetime import datetime
 from db_driver import AssistantDatabaseDriver
+from livekit.agents import llm
 import logging
 
 logger = logging.getLogger("AssistantFnc")
 
 class AssistantFnc:
-    """Function context for the AI voice assistant agent providing tools for user management,
-    conversation tracking, task management, contact management, and settings management."""
 
     def __init__(self):
         """Initialize the Assistant Function context with database driver."""
         self.db = AssistantDatabaseDriver()
         logger.info("AssistantFnc initialized with database connection")
 
+    @llm.ai_callable()
     def get_user_profile(self, user_id: str) -> Dict[str, Any]:
         """
         Retrieve a user's profile information from the database.
@@ -30,6 +30,7 @@ class AssistantFnc:
             return {"error": "User not found"}
         return user
 
+    @llm.ai_callable()
     def create_or_update_user(
         self,
         user_id: str,
@@ -49,6 +50,7 @@ class AssistantFnc:
         """
         return self.db.create_or_update_user(user_id, name, preferences)
 
+    @llm.ai_callable()
     def save_conversation(
         self,
         user_id: str,
@@ -75,6 +77,7 @@ class AssistantFnc:
             logger.error(f"Failed to save conversation: {e}")
             return False
 
+    @llm.ai_callable()
     def get_recent_conversations(
         self,
         user_id: str,
@@ -92,6 +95,7 @@ class AssistantFnc:
         """
         return self.db.get_recent_conversations(user_id, limit)
 
+    @llm.ai_callable()
     def add_task(
         self,
         user_id: str,
@@ -125,6 +129,7 @@ class AssistantFnc:
 
         return self.db.add_task(user_id, title, description, parsed_due_date, priority, category)
 
+    @llm.ai_callable()
     def get_pending_tasks(
         self,
         user_id: str,
@@ -142,6 +147,7 @@ class AssistantFnc:
         """
         return self.db.get_pending_tasks(user_id, category)
 
+    @llm.ai_callable()
     def complete_task(self, task_id: int) -> bool:
         """
         Mark a task as completed.
@@ -154,6 +160,7 @@ class AssistantFnc:
         """
         return self.db.complete_task(task_id)
 
+    @llm.ai_callable()
     def add_contact(
         self,
         user_id: str,
@@ -179,6 +186,7 @@ class AssistantFnc:
         """
         return self.db.add_contact(user_id, name, phone, email, relationship, notes)
 
+    @llm.ai_callable()
     def get_contacts(
         self,
         user_id: str,
@@ -196,6 +204,7 @@ class AssistantFnc:
         """
         return self.db.get_contacts(user_id, name_filter)
 
+    @llm.ai_callable()
     def update_user_settings(
         self,
         user_id: str,
@@ -220,6 +229,7 @@ class AssistantFnc:
             logger.error(f"Failed to update user settings: {e}")
             return False
 
+    @llm.ai_callable()
     def get_user_settings(self, user_id: str) -> Dict[str, Any]:
         """
         Get all settings for a user.
@@ -235,6 +245,7 @@ class AssistantFnc:
             return {"error": "Settings not found"}
         return settings
 
+    @llm.ai_callable()
     def generate_summary(self, user_id: str) -> Dict[str, Any]:
         """
         Generate a summary of user activity and status.
