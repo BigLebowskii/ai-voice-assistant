@@ -13,8 +13,8 @@ A full-stack voice assistant application that leverages LiveKit for real-time co
 
 ## Prerequisites
 
-- Node.js (v14 or higher)
-- Python 3.8+
+- Node.js (v20)
+- Python 3.12
 - PostgreSQL database
 - LiveKit account
 - OpenAI API key
