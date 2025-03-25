@@ -1,6 +1,6 @@
 # AI Voice Assistant
 
-A full-stack voice assistant application that leverages LiveKit for real-time communication, OpenAI for intelligent responses, and a PostgreSQL database for data persistence.
+A voice assistant application that leverages LiveKit for real-time communication, OpenAI for intelligent responses, and a PostgreSQL database for data persistence.
 
 ## Features
 
@@ -161,9 +161,6 @@ The application should now be running at `http://localhost:5173` (or the port sp
 - **Database Connection Issues**: Verify your PostgreSQL credentials and ensure the database is running.
 - **OpenAI API Issues**: Confirm your OpenAI API key is valid and has sufficient credits.
 
-## License
-
-[MIT License](LICENSE)
 
 ## Contributing
 
